@@ -2,6 +2,79 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@kb-labs/core-contracts": [
+        "../kb-labs-core/packages/core-contracts/src/index.ts"
+      ],
+      "@kb-labs/core-contracts/*": [
+        "../kb-labs-core/packages/core-contracts/src/*"
+      ],
+      "@kb-labs/core-discovery": [
+        "../kb-labs-core/packages/core-discovery/src/index.ts"
+      ],
+      "@kb-labs/core-discovery/*": [
+        "../kb-labs-core/packages/core-discovery/src/*"
+      ],
+      "@kb-labs/core-platform": [
+        "../kb-labs-core/packages/core-platform/src/index.ts"
+      ],
+      "@kb-labs/core-platform/*": [
+        "../kb-labs-core/packages/core-platform/src/*"
+      ],
+      "@kb-labs/core-runtime": [
+        "../kb-labs-core/packages/core-runtime/src/index.ts"
+      ],
+      "@kb-labs/core-runtime/*": [
+        "../kb-labs-core/packages/core-runtime/src/*"
+      ],
+      "@kb-labs/core-sys": [
+        "../kb-labs-core/packages/core-sys/src/index.ts"
+      ],
+      "@kb-labs/core-sys/*": [
+        "../kb-labs-core/packages/core-sys/src/*"
+      ],
+      "@kb-labs/marketplace-api": [
+        "packages/marketplace-api/src/index.ts"
+      ],
+      "@kb-labs/marketplace-api/*": [
+        "packages/marketplace-api/src/*"
+      ],
+      "@kb-labs/marketplace-contracts": [
+        "packages/marketplace-contracts/src/index.ts"
+      ],
+      "@kb-labs/marketplace-contracts/*": [
+        "packages/marketplace-contracts/src/*"
+      ],
+      "@kb-labs/marketplace-core": [
+        "packages/marketplace-core/src/index.ts"
+      ],
+      "@kb-labs/marketplace-core/*": [
+        "packages/marketplace-core/src/*"
+      ],
+      "@kb-labs/marketplace-npm": [
+        "packages/marketplace-npm/src/index.ts"
+      ],
+      "@kb-labs/marketplace-npm/*": [
+        "packages/marketplace-npm/src/*"
+      ],
+      "@kb-labs/plugin-contracts": [
+        "../../infra/kb-labs-plugin/packages/plugin-contracts/src/index.ts"
+      ],
+      "@kb-labs/plugin-contracts/*": [
+        "../../infra/kb-labs-plugin/packages/plugin-contracts/src/*"
+      ],
+      "@kb-labs/sdk": [
+        "../kb-labs-sdk/packages/sdk/src/index.ts"
+      ],
+      "@kb-labs/sdk/*": [
+        "../kb-labs-sdk/packages/sdk/src/*"
+      ],
+      "@kb-labs/shared-http": [
+        "../kb-labs-shared/packages/shared-http/src/index.ts"
+      ],
+      "@kb-labs/shared-http/*": [
+        "../kb-labs-shared/packages/shared-http/src/*"
+      ]
+    }
   }
 }
