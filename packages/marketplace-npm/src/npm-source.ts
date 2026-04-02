@@ -36,7 +36,7 @@ export class NpmPackageSource implements PackageSource {
   ): Promise<InstalledPackage> {
     const spec = pkg.version === 'latest' ? pkg.id : `${pkg.id}@${pkg.version}`;
     const args = ['add', spec];
-    if (opts?.dev) args.push('--save-dev');
+    if (opts?.dev) {args.push('--save-dev');}
 
     await execa('pnpm', args, { cwd: root, timeout: 5 * 60 * 1000 });
 
@@ -70,11 +70,11 @@ export class NpmPackageSource implements PackageSource {
 // ---------------------------------------------------------------------------
 
 function extractPackageName(spec: string): string | null {
-  if (!spec || spec.startsWith('.') || spec.startsWith('/')) return null;
+  if (!spec || spec.startsWith('.') || spec.startsWith('/')) {return null;}
 
   if (spec.startsWith('@')) {
     const slashIndex = spec.indexOf('/');
-    if (slashIndex === -1) return null;
+    if (slashIndex === -1) {return null;}
     const versionSep = spec.lastIndexOf('@');
     return versionSep > slashIndex ? spec.slice(0, versionSep) : spec;
   }
