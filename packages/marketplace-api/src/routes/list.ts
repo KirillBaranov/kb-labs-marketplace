@@ -1,6 +1,5 @@
 import '../types.js';
 import type { FastifyInstance } from 'fastify';
-import type { MarketplaceService } from '@kb-labs/marketplace-core';
 import type { EntityKind } from '@kb-labs/core-discovery';
 
 export function listRoute(app: FastifyInstance): void {
