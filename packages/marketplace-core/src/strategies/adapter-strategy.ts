@@ -27,7 +27,7 @@ export class AdapterStrategy implements EntityKindStrategy {
     service: MarketplaceServiceAPI,
   ): Promise<void> {
     const manifest = await loadAdapterManifest(packageRoot);
-    if (!manifest?.requires?.adapters) return;
+    if (!manifest?.requires?.adapters) {return;}
 
     const installed = await service.list({ kind: 'adapter' });
     const installedIds = new Set(installed.map(e => (e as any).id as string));
