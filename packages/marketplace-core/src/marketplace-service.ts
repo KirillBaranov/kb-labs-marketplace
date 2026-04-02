@@ -9,7 +9,7 @@ import * as path from 'node:path';
 import * as crypto from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { glob } from 'glob';
-import type { EntityKind, MarketplaceEntry } from '@kb-labs/core-discovery';
+import type { EntityKind, MarketplaceEntry, MarketplaceLock } from '@kb-labs/core-discovery';
 import {
   readMarketplaceLock,
   writeMarketplaceLock,
@@ -32,7 +32,6 @@ import type {
   SyncResult,
   DoctorReport,
   DoctorIssue,
-  ManifestCacheEntry,
 } from '@kb-labs/marketplace-contracts';
 import { setCacheEntry, removeCacheEntry } from './manifest-cache.js';
 import { PluginStrategy } from './strategies/plugin-strategy.js';
@@ -220,7 +219,7 @@ export class MarketplaceService implements MarketplaceServiceAPI {
   async update(packageIds?: string[]): Promise<InstallResult> {
     const diag = new DiagnosticCollector();
     const lock = await readMarketplaceLock(this.root, diag);
-    if (!lock) return { installed: [], warnings: ['No marketplace.lock found'] };
+    if (!lock) {return { installed: [], warnings: ['No marketplace.lock found'] };}
 
     const ids = packageIds ?? Object.keys(lock.installed);
     const specs = ids.filter(id => id in lock.installed);
@@ -254,7 +253,7 @@ export class MarketplaceService implements MarketplaceServiceAPI {
   async list(filter?: { kind?: EntityKind }): Promise<MarketplaceEntryWithId[]> {
     const diag = new DiagnosticCollector();
     const lock = await readMarketplaceLock(this.root, diag);
-    if (!lock) return [];
+    if (!lock) {return [];}
 
     let entries = Object.entries(lock.installed).map(([id, entry]) => ({ ...entry, id }));
     if (filter?.kind) {
@@ -303,64 +302,64 @@ export class MarketplaceService implements MarketplaceServiceAPI {
 
     for (const relPkgJson of packageJsonPaths) {
       const pkgDir = path.resolve(this.root, path.dirname(relPkgJson));
-
-      // Read package.json
-      let pkgName: string;
-      let pkgVersion: string;
-      try {
-        const pkgJson = JSON.parse(await fs.readFile(path.join(pkgDir, 'package.json'), 'utf-8'));
-        pkgName = pkgJson.name;
-        pkgVersion = pkgJson.version ?? '0.0.0';
-        if (!pkgName) continue;
-      } catch {
-        continue;
-      }
-
-      // Skip if already in lock
-      if (existingIds.has(pkgName)) {
-        skipped.push({ id: pkgName, reason: 'already in lock' });
-        continue;
-      }
-
-      // Detect kind — only add if a strategy positively identified it
-      let detected = false;
-      for (const strategy of this.strategies.values()) {
-        const kind = await strategy.detectKind(pkgDir);
-        if (kind) {
-          detected = true;
-          break;
-        }
-      }
-
-      if (!detected) {
-        continue;
-      }
-
-      const primaryKind = await this.detectKind(pkgDir);
-      const strategy = this.strategies.get(primaryKind);
-      const provides = strategy ? await strategy.extractProvides(pkgDir) : [primaryKind];
-      const integrity = await computeIntegrity(pkgDir);
-
-      const entry = createMarketplaceEntry({
-        version: pkgVersion,
-        integrity,
-        resolvedPath: relativeToRoot(this.root, pkgDir),
-        source: 'local',
-        primaryKind,
-        provides,
-      });
-
-      if (!autoEnable) {
-        entry.enabled = false;
-      }
-
-      lock.installed[pkgName] = entry;
-      added.push({ id: pkgName, primaryKind, version: pkgVersion });
+      await this._syncPackage(pkgDir, relPkgJson, existingIds, autoEnable, lock, added, skipped);
     }
 
     await writeMarketplaceLock(this.root, lock);
 
     return { added, skipped, total: Object.keys(lock.installed).length };
+  }
+
+  private async _syncPackage(
+    pkgDir: string,
+    _relPkgJson: string,
+    existingIds: Set<string>,
+    autoEnable: boolean,
+    lock: MarketplaceLock,
+    added: SyncResult['added'],
+    skipped: SyncResult['skipped'],
+  ): Promise<void> {
+    let pkgName: string;
+    let pkgVersion: string;
+    try {
+      const pkgJson = JSON.parse(await fs.readFile(path.join(pkgDir, 'package.json'), 'utf-8'));
+      pkgName = pkgJson.name;
+      pkgVersion = pkgJson.version ?? '0.0.0';
+      if (!pkgName) { return; }
+    } catch {
+      return;
+    }
+
+    if (existingIds.has(pkgName)) {
+      skipped.push({ id: pkgName, reason: 'already in lock' });
+      return;
+    }
+
+    let detected = false;
+    for (const strategy of this.strategies.values()) {
+      const kind = await strategy.detectKind(pkgDir);
+      if (kind) { detected = true; break; }
+    }
+    if (!detected) { return; }
+
+    const primaryKind = await this.detectKind(pkgDir);
+    const strategy = this.strategies.get(primaryKind);
+    const provides = strategy ? await strategy.extractProvides(pkgDir) : [primaryKind];
+    const integrity = await computeIntegrity(pkgDir);
+
+    const entry = createMarketplaceEntry({
+      version: pkgVersion,
+      integrity,
+      resolvedPath: relativeToRoot(this.root, pkgDir),
+      source: 'local',
+      primaryKind,
+      provides,
+    });
+
+    if (!autoEnable) { entry.enabled = false; }
+
+    lock.installed[pkgName] = entry;
+    added.push({ id: pkgName, primaryKind, version: pkgVersion });
   }
 
   // -------------------------------------------------------------------------
@@ -433,7 +432,7 @@ export class MarketplaceService implements MarketplaceServiceAPI {
     // Try each strategy in registration order
     for (const strategy of this.strategies.values()) {
       const kind = await strategy.detectKind(packageRoot);
-      if (kind) return kind;
+      if (kind) {return kind;}
     }
     // Default: plugin
     return 'plugin';
