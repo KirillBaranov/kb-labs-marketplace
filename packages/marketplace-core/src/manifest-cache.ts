@@ -19,7 +19,7 @@ export async function readManifestCache(root: string): Promise<ManifestCache | n
   try {
     const raw = await fs.readFile(cachePath, 'utf-8');
     const parsed = JSON.parse(raw);
-    if (parsed?.schema !== SCHEMA_VERSION) return null;
+    if (parsed?.schema !== SCHEMA_VERSION) {return null;}
     return parsed as ManifestCache;
   } catch {
     return null;
@@ -67,7 +67,7 @@ export async function removeCacheEntry(
   packageId: string,
 ): Promise<void> {
   const existing = await readManifestCache(root);
-  if (!existing || !(packageId in existing.entries)) return;
+  if (!existing || !(packageId in existing.entries)) {return;}
   delete existing.entries[packageId];
   await writeManifestCache(root, existing);
 }
