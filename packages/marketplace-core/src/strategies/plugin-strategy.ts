@@ -19,7 +19,7 @@ export class PluginStrategy implements EntityKindStrategy {
   async extractProvides(packageRoot: string): Promise<EntityKind[]> {
     const diag = new DiagnosticCollector();
     const manifest = await loadManifest(packageRoot, diag);
-    if (!manifest) return ['plugin'];
+    if (!manifest) {return ['plugin'];}
     return extractEntityKinds(manifest);
   }
 }
