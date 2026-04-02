@@ -43,7 +43,7 @@ export async function post<T = unknown>(path: string, body: Record<string, unkno
 export async function get<T = unknown>(path: string, params?: Record<string, string>): Promise<T> {
   const url = new URL(`${getBaseUrl()}${path}`);
   if (params) {
-    for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+    for (const [k, v] of Object.entries(params)) {url.searchParams.set(k, v);}
   }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
