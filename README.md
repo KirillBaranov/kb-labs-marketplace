@@ -1,306 +1,140 @@
-# Standard Configuration Templates
+# KB Labs Marketplace
 
-This directory contains canonical configuration templates for all `@kb-labs` packages.
+Unified marketplace service for KB Labs. This repo owns plugin and package lifecycle operations such as install, uninstall, enable, disable, link, unlink, sync, doctor, and list.
 
-## 📋 Available Templates
+## Overview
 
-### Core Configs (All Packages)
+Marketplace is split into a small set of focused packages:
 
-| File | Purpose | Required | Customizable |
-|------|---------|----------|--------------|
-| **eslint.config.js** | Linting rules | ✅ Yes | ⚠️ Minimal |
-| **tsconfig.json** | TypeScript IDE config | ✅ Yes | ❌ No |
-| **tsconfig.build.json** | TypeScript build config | ✅ Yes | ❌ No |
+- [`@kb-labs/marketplace-app`](/Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace/apps/marketplace/package.json): Fastify entrypoint that runs the HTTP service
+- [`@kb-labs/marketplace-api`](/Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace/packages/marketplace-api/package.json): routes, OpenAPI, observability surfaces
+- [`@kb-labs/marketplace-core`](/Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace/packages/marketplace-core/package.json): domain logic for package lifecycle operations
+- [`@kb-labs/marketplace-contracts`](/Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace/packages/marketplace-contracts/package.json): shared types and contracts
+- [`@kb-labs/marketplace-npm`](/Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace/packages/marketplace-npm/package.json): npm/pnpm-backed source integration
+- [`@kb-labs/marketplace-cli`](/Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace/packages/marketplace-cli/package.json): CLI-facing integration package
 
-### Tsup Configs (Choose ONE based on package type)
+The service runs on port `5070` in local development.
 
-| Template | Package Type | Use Cases |
-|----------|--------------|-----------|
-| **tsup.config.ts** | 📦 **Library** (default) | Most packages, importable libraries |
-| **tsup.config.bin.ts** | 🔧 **Binary** | Standalone executables, CLI bins |
-| **tsup.config.cli.ts** | ⌨️ **CLI** | CLI packages with commands |
-| **tsup.config.dual.ts** | 📦🔧 **Library + Binary** | Packages with both API and bin |
+## Development
 
-### Package.json Examples
-
-| Template | Purpose |
-|----------|---------|
-| **package.json.lib** | Library package example |
-| **package.json.bin** | Binary package example |
-
-## 🎯 Philosophy
-
-**Convention over Configuration**
-
-All `@kb-labs` packages MUST use these exact templates with minimal customization. This ensures:
-
-- ✅ Consistent build output across all packages
-- ✅ Predictable dependency resolution
-- ✅ Unified linting standards
-- ✅ Easy maintenance and upgrades
-
-## 📦 Usage
-
-### For New Packages
-
-#### Step 1: Choose Package Type
-
-**Library Package** (most common):
-```bash
-cp kb-labs-devkit/templates/configs/tsup.config.ts your-package/
-cp kb-labs-devkit/templates/configs/eslint.config.js your-package/
-cp kb-labs-devkit/templates/configs/tsconfig*.json your-package/
-cp kb-labs-devkit/templates/configs/package.json.lib your-package/package.json
-```
-
-**Binary Package** (standalone executables):
-```bash
-cp kb-labs-devkit/templates/configs/tsup.config.bin.ts your-package/tsup.config.ts
-cp kb-labs-devkit/templates/configs/eslint.config.js your-package/
-cp kb-labs-devkit/templates/configs/tsconfig*.json your-package/
-cp kb-labs-devkit/templates/configs/package.json.bin your-package/package.json
-```
-
-**CLI Package** (command handlers):
-```bash
-cp kb-labs-devkit/templates/configs/tsup.config.cli.ts your-package/tsup.config.ts
-cp kb-labs-devkit/templates/configs/eslint.config.js your-package/
-cp kb-labs-devkit/templates/configs/tsconfig*.json your-package/
-cp kb-labs-devkit/templates/configs/package.json.lib your-package/package.json
-```
-
-**Dual Package** (library + binary):
-```bash
-cp kb-labs-devkit/templates/configs/tsup.config.dual.ts your-package/tsup.config.ts
-cp kb-labs-devkit/templates/configs/eslint.config.js your-package/
-cp kb-labs-devkit/templates/configs/tsconfig*.json your-package/
-cp kb-labs-devkit/templates/configs/package.json.lib your-package/package.json
-# Then add "bin" field to package.json
-```
-
-#### Step 2: Customize Package Name
-```bash
-# Edit package.json and update name, description
-```
-
-### For Existing Packages
+From repo root:
 
 ```bash
-# Check for drift
-npx kb-devkit-check-configs
-
-# Auto-fix drift
-npx kb-devkit-check-configs --fix
+pnpm install
+pnpm build
+pnpm test
+pnpm type-check
 ```
 
-## 🔧 Customization Rules
-
-### tsup.config.ts
-
-**Allowed customizations:**
-
-```typescript
-export default defineConfig({
-  ...nodePreset,
-  tsconfig: 'tsconfig.build.json', // ✅ Always required
-
-  // ✅ OK: Multiple entry points
-  entry: ['src/index.ts', 'src/cli.ts'],
-
-  // ✅ OK: Extra external deps (if really needed)
-  external: ['special-native-module'],
-
-  dts: true, // ✅ Always required
-});
-```
-
-**NOT allowed:**
-
-```typescript
-// ❌ WRONG: Don't override preset settings
-export default defineConfig({
-  format: ['esm'],        // Already in preset!
-  target: 'es2022',       // Already in preset!
-  sourcemap: true,        // Already in preset!
-  // ...
-});
-
-// ❌ WRONG: Don't disable types
-dts: false,
-
-// ❌ WRONG: Don't duplicate external deps
-external: [
-  '@kb-labs/core',  // Already in preset!
-  '@kb-labs/cli',   // Already in preset!
-],
-```
-
-### eslint.config.js
-
-**Allowed customizations:**
-
-```javascript
-export default [
-  ...nodePreset,
-  {
-    // ✅ OK: Project-specific ignores only
-    ignores: ['**/*.generated.ts']
-  }
-];
-```
-
-**NOT allowed:**
-
-```javascript
-// ❌ WRONG: Don't duplicate preset ignores
-export default [
-  ...nodePreset,
-  {
-    ignores: [
-      '**/dist/**',        // Already in preset!
-      '**/node_modules/**', // Already in preset!
-    ]
-  }
-];
-```
-
-### tsconfig.json & tsconfig.build.json
-
-**NOT customizable!**
-
-These files MUST remain identical to templates. All TypeScript configuration is standardized in DevKit presets.
-
-```json
-// ❌ WRONG: Don't override extends
-{
-  "extends": "./my-custom-base.json"
-}
-
-// ❌ WRONG: Don't add compilerOptions
-{
-  "extends": "@kb-labs/devkit/tsconfig/node.json",
-  "compilerOptions": {
-    "strict": false  // Don't override preset!
-  }
-}
-```
-
-## 🔍 Drift Detection
-
-DevKit automatically detects configuration drift:
+Run the marketplace service directly:
 
 ```bash
-# Check all packages
-npx kb-devkit-check-configs
-
-# Check specific package
-npx kb-devkit-check-configs --package=@kb-labs/core
-
-# Auto-fix (creates backup)
-npx kb-devkit-check-configs --fix
-
-# CI mode (fail on drift)
-npx kb-devkit-check-configs --ci
+cd /Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace
+pnpm --filter @kb-labs/marketplace-app dev
 ```
 
-### Drift Detection Rules
+Run it through the workspace dev manager:
 
-| Issue | Severity | Auto-fix |
-|-------|----------|----------|
-| Missing `dts: true` | 🔴 Error | ✅ Yes |
-| Using `dts: false` | 🔴 Error | ✅ Yes |
-| Not using `nodePreset` | 🔴 Error | ⚠️ Manual |
-| Duplicate `external` | 🟡 Warning | ✅ Yes |
-| Duplicate `ignores` | 🟡 Warning | ✅ Yes |
-| Missing templates | 🔴 Error | ✅ Yes |
-| Modified templates | 🔴 Error | ⚠️ Manual |
-
-## 📚 Examples
-
-### ✅ Good Example (Minimal Package)
-
-```typescript
-// tsup.config.ts
-import { defineConfig } from 'tsup';
-import nodePreset from '@kb-labs/devkit/tsup/node.js';
-
-export default defineConfig({
-  ...nodePreset,
-  tsconfig: 'tsconfig.build.json',
-  entry: ['src/index.ts'],
-  dts: true,
-});
+```bash
+cd /Users/kirillbaranov/Desktop/kb-labs-workspace
+./scripts/kb-dev start marketplace
+./scripts/kb-dev ready marketplace --timeout 30s
+./scripts/kb-dev status --json | jq '.services.marketplace'
 ```
 
-### ✅ Good Example (CLI Package with Multiple Entries)
+## HTTP Service
 
-```typescript
-// tsup.config.ts
-import { defineConfig } from 'tsup';
-import nodePreset from '@kb-labs/devkit/tsup/node.js';
+Default local base URL:
 
-export default defineConfig({
-  ...nodePreset,
-  tsconfig: 'tsconfig.build.json',
-  entry: [
-    'src/index.ts',
-    'src/cli/index.ts',
-    'src/cli/commands/build.ts',
-    'src/cli/commands/test.ts',
-  ],
-  dts: true,
-});
+```text
+http://localhost:5070
 ```
 
-### ❌ Bad Example (Over-configured)
+Primary runtime endpoints:
 
-```typescript
-// tsup.config.ts
-import { defineConfig } from 'tsup';
+- `GET /health`
+- `GET /ready`
+- `GET /metrics`
+- `GET /observability/describe`
+- `GET /observability/health`
 
-// ❌ Not using preset!
-export default defineConfig({
-  format: ['esm'],
-  target: 'es2022',
-  sourcemap: true,
-  clean: true,
-  dts: true,
-  entry: ['src/index.ts'],
-  external: [/^@kb-labs\/.*/],  // Manual external
-});
+Marketplace API routes are registered from [`packages/marketplace-api/src/routes`](/Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace/packages/marketplace-api/src/routes) under the `/api/v1/marketplace` prefix. Health and observability surfaces stay at the service root.
+
+Representative operations:
+
+- `POST /api/v1/marketplace/install`
+- `POST /api/v1/marketplace/uninstall`
+- `POST /api/v1/marketplace/enable`
+- `POST /api/v1/marketplace/disable`
+- `POST /api/v1/marketplace/link`
+- `POST /api/v1/marketplace/unlink`
+- `POST /api/v1/marketplace/sync`
+- `POST /api/v1/marketplace/update`
+- `GET /api/v1/marketplace/list`
+- `GET /api/v1/marketplace/doctor`
+
+## Observability
+
+Marketplace is already migrated to the platform observability contract.
+
+Canonical surfaces:
+
+- `GET /health` — cheap public liveness
+- `GET /ready` — readiness gate
+- `GET /metrics` — Prometheus-compatible metrics
+- `GET /observability/describe` — versioned service descriptor
+- `GET /observability/health` — structured runtime diagnostics
+
+The service emits bounded marketplace domain operations such as:
+
+- `marketplace.bootstrap`
+- `marketplace.list`
+- `marketplace.install`
+- `marketplace.uninstall`
+- `marketplace.enable`
+- `marketplace.disable`
+- `marketplace.link`
+- `marketplace.unlink`
+- `marketplace.sync`
+- `marketplace.update`
+- `marketplace.doctor`
+
+Implementation entrypoint:
+
+- [`packages/marketplace-api/src/server.ts`](/Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace/packages/marketplace-api/src/server.ts)
+
+Verification:
+
+```bash
+curl http://localhost:5070/health
+curl http://localhost:5070/ready
+curl http://localhost:5070/observability/describe
+curl http://localhost:5070/observability/health
+curl http://localhost:5070/metrics
 ```
 
-## 🚀 Migration Guide
+## Quality Checks
 
-### From Custom Config to Standard Template
+Useful local commands:
 
-1. **Backup your current config**
-   ```bash
-   cp tsup.config.ts tsup.config.ts.backup
-   ```
+```bash
+cd /Users/kirillbaranov/Desktop/kb-labs-workspace/platform/kb-labs-marketplace
+pnpm build
+pnpm test
+pnpm type-check
+```
 
-2. **Copy standard template**
-   ```bash
-   cp kb-labs-devkit/templates/configs/tsup.config.ts .
-   ```
+Focused package checks:
 
-3. **Migrate customizations** (only if needed)
-   - Compare your backup with template
-   - Extract only truly necessary customizations
-   - Add them with comments explaining why
+```bash
+pnpm --filter @kb-labs/marketplace-api build
+pnpm --filter @kb-labs/marketplace-api test
+pnpm --filter @kb-labs/marketplace-core build
+pnpm --filter @kb-labs/marketplace-contracts build
+```
 
-4. **Test build**
-   ```bash
-   pnpm run build
-   ```
+## Notes
 
-5. **Verify types**
-   ```bash
-   npx kb-devkit-check-types
-   ```
-
-## 🔗 Related
-
-- [DevKit README](../../README.md)
-- [DevKit Usage Guide](../../USAGE_GUIDE.md)
-- [ADR-0009: Unified Build Convention](../../docs/adr/0009-unified-build-convention.md)
+- Marketplace is part of the platform backend and should stay aligned with the shared observability and service bootstrap patterns.
+- For cross-workspace service orchestration, prefer `kb-dev` over ad hoc background processes.
+- If marketplace behavior changes, update this README together with route or observability changes.
