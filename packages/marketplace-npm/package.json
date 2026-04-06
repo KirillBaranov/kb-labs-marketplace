@@ -1,6 +1,6 @@
 {
   "name": "@kb-labs/marketplace-npm",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "npm/pnpm package source for KB Labs marketplace",
   "type": "module",
   "main": "./dist/index.js",
