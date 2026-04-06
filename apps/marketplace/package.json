@@ -1,9 +1,12 @@
 {
   "name": "@kb-labs/marketplace-app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "KB Labs Marketplace service — Fastify entrypoint",
   "type": "module",
   "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsup",
