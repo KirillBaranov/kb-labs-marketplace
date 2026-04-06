@@ -1,6 +1,6 @@
 {
   "name": "@kb-labs/marketplace-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "KB Labs Marketplace service — Fastify entrypoint",
   "type": "module",
   "main": "./dist/index.js",
@@ -29,5 +29,8 @@
     "tsx": "^4.20.5",
     "@kb-labs/devkit": "link:../../../../infra/kb-labs-devkit",
     "@types/node": "^24.3.3"
+  },
+  "kb": {
+    "manifest": "./dist/manifest.js"
   }
 }
