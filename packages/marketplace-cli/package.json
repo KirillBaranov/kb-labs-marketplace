@@ -1,6 +1,6 @@
 {
   "name": "@kb-labs/marketplace-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Marketplace CLI plugin — commands for managing plugins, adapters, and other marketplace entities",
   "type": "module",
   "main": "./dist/index.js",
