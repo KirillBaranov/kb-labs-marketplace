@@ -1,6 +1,6 @@
 {
   "name": "@kb-labs/marketplace-core",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Marketplace service — unified install/uninstall/enable/disable for all entity types",
   "type": "module",
   "main": "./dist/index.js",
