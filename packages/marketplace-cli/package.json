@@ -1,6 +1,6 @@
 {
   "name": "@kb-labs/marketplace-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Marketplace CLI plugin — commands for managing plugins, adapters, and other marketplace entities",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,7 +17,9 @@
   "kb": {
     "manifest": "./dist/manifest.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "scripts": {
     "clean": "rimraf dist",
