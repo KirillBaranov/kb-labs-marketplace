@@ -2,3 +2,10 @@ packages:
   - apps/*
   - packages/*
   - ../../infra/kb-labs-devkit
+  - ../../infra/kb-labs-plugin/apps/*
+  - ../../infra/kb-labs-plugin/packages/*
+  - ../kb-labs-core/apps/*
+  - ../kb-labs-core/packages/*
+  - ../kb-labs-sdk/packages/*
+  - ../kb-labs-shared/apps/*
+  - ../kb-labs-shared/packages/*
