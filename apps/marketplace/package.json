@@ -25,7 +25,8 @@
     "@kb-labs/core-runtime": "link:../../../kb-labs-core/packages/core-runtime",
     "@kb-labs/core-platform": "link:../../../kb-labs-core/packages/core-platform",
     "@kb-labs/core-sys": "link:../../../kb-labs-core/packages/core-sys",
-    "fastify": "^5.3.3"
+    "fastify": "^5.3.3",
+    "@kb-labs/plugin-contracts": "link:../../../../infra/kb-labs-plugin/packages/plugin-contracts"
   },
   "devDependencies": {
     "tsup": "^8.5.0",
